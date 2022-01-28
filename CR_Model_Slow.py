@@ -844,7 +844,7 @@ if 1:
     m0 = 3.6E-5*Sigma**(0.75)
     #NCOL = 1.22*(Sigma/(1.4*mh))
     NCOL = 1.22*(Sigma/(2.8*mh))
-    print "Sigm = %e\tNCOL = %e\n"%(Sigma, NCOL)
+    print "Sigma = %e\tNCOL = %e\n"%(Sigma, NCOL)
     #CRSPEC.set_column(NCOL)
 
     print "Generating 2D plots"

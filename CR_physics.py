@@ -97,7 +97,7 @@ def calcSpecParams(U, T, nh, B, Rsh, Rp = 0, eta=1.0E-5):
         lamb = sopt.bisect(eta_func, 3.0, 5.0)
     except ValueError:
         lamb = 3.5
-        print 'USING DEFAULT LAMB = ', lamb
+        print('USING DEFAULT LAMB = ', lamb)
     pinj = lamb*mh*(U*1E5/r)*np.sqrt(gamma_ad*(r-1))
     pinj_MeVc = 1.8711574E16*pinj
     a = 3./(r - 1.); b1 = (2*r-5.)/(r-1.); b2 = (r-4.)/(r-1.)
@@ -112,7 +112,7 @@ def calcSpecParams(U, T, nh, B, Rsh, Rp = 0, eta=1.0E-5):
     try:
         beta_test = sopt.bisect(Elossfunc, betath, 1.0)
     except ValueError:
-        print "bisect failed - loss"
+        print("bisect failed - loss")
         failCount += 1
         beta_test = 0.9999999999999999
     gamma_test = gamma(beta_test)
@@ -123,7 +123,7 @@ def calcSpecParams(U, T, nh, B, Rsh, Rp = 0, eta=1.0E-5):
         gamma_test = gamma(beta_test)
         E_damp = mpc2*(gamma_test-1)
     except ValueError:
-        print "bisect failed - damp"
+        print("bisect failed - damp")
         failCount += 1
         E_damp = 1E50
 
@@ -132,7 +132,7 @@ def calcSpecParams(U, T, nh, B, Rsh, Rp = 0, eta=1.0E-5):
         gamma_test = gamma(beta_test)
         E_escu = mpc2*(gamma_test-1)
     except ValueError:
-        print "bisect failed - esc_u"
+        print("bisect failed - esc_u")
         failCount += 1
         E_escu = 1E50
 
@@ -204,7 +204,7 @@ def calcSpecParamsLE(U, T, nh, B, Rsh, Rp = 0):
     try:
         beta_test = sopt.bisect(Elossfunc, betath, 1.0)
     except ValueError:
-        print "Using fminbound"
+        print("Using fminbound")
         beta_test = sopt.fminbound(Elossfunc, betath, 1.0)
     gamma_test = gamma(beta_test)
     E_loss = min(mpc2*(gamma_test-1), 50.)

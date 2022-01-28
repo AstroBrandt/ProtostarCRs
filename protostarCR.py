@@ -34,15 +34,15 @@ GeVc_to_cgs = 5.3442859E-14
 GeV_to_erg = 0.0016021766
 
 class ProtostarCR():
-    self.eArr = np.logspace(-2, 11, 256)
+    eArr = np.logspace(-2, 11, 256)
     #assume ku/kd = 1, e.g. dB/B = 1
-    self.ku = 1
-    self.kd = self.ku
-    self.x = 0.8
+    ku = 1
+    kd = ku
+    x = 0.8
     def __init__(self):
         return
-    def addLossFunction(lfile):
-        dat = np.loadtxt(lfilee, delimiter=',')
+    def addLossFunction(self, lfile):
+        dat = np.loadtxt(lfile, delimiter=',')
         eSpace = dat[1:,0]
         LE = (dat[1:,1]*1E-16)/1E9 #to get in GeV/cm^2
         self.LE1 = si.interp1d(np.log10(eSpace), np.log10(LE), kind='quadratic', fill_value='extrapolate', bounds_error=False)
@@ -54,9 +54,9 @@ class ProtostarCR():
     #T = temperature in K
     #nh = shock number density, cm^-3
     #Magnetic field, in muG
-    #Rsh, Rp = shock radius and perpendicular radius in cm
+    #Rsh, Rp = shock radius and perpendicular radius in au
     #eta = efficiency value for the shock
-    def calcSpecParams(U, T, nh, B, Rsh, Rp = 0, eta=1.0E-5):
+    def calcSpecParams(self, U, T, nh, B, Rsh, Rp = 0, eta=1.0E-5):
         #Thermal beta factor for the constraint equations
         #This is effectively the tail of the thermal distribution.
         #This sets the lower bound for the below constraint equations
@@ -80,7 +80,7 @@ class ProtostarCR():
             return eta - (4./(3.*np.sqrt(np.pi)))*(r - 1)*lamb**3*np.exp(-lamb**2)
         #Returns the loss function as a function of beta.
         def LEcp(beta): #in 1E-25 GeV cm^2
-              return LE1((gamma(beta)-1.)*mpc2)#0.1*((x*beta)/(betath**3 + beta**3))
+              return self.LE1((gamma(beta)-1.)*mpc2)#0.1*((x*beta)/(betath**3 + beta**3))
         #Below are all the equations to root-solve to constrain the maximum energy
         #possible to accelerate to. Constraints by energy losses, wave dampening,
         #up- and downstream diffusion and the shock age versus acceleration timescale
@@ -94,8 +94,8 @@ class ProtostarCR():
             return beta*LEcp(beta) - fac
         #Function to root solve for the constraint by wave dampening
         def damp_func(beta):
-            TH = (B/(1E-5))**4 + 1.4E12*gamma(beta)**2*beta**2*x**2*(T/1E4)**(0.8)*(nh/1E6)**3
-            fac = 8.8E-5*TH*(1-x)**(-1)*(U/1E2)**3*(T/1E4)**(-0.4)*(nh/1E6)**(-0.5)*(B/1E-5)**(-4)*(Ptwidle_CR/1E-2)
+            TH = (B/(1E-5))**4 + 1.4E12*gamma(beta)**2*beta**2*self.x**2*(T/1E4)**(0.8)*(nh/1E6)**3
+            fac = 8.8E-5*TH*(1-self.x)**(-1)*(U/1E2)**3*(T/1E4)**(-0.4)*(nh/1E6)**(-0.5)*(B/1E-5)**(-4)*(Ptwidle_CR/1E-2)
             return gamma(beta)*beta**2 - fac
         #Upstream and downstream diffusion constraints
         def Eescu_func(beta):
@@ -129,7 +129,7 @@ class ProtostarCR():
             lamb = sopt.bisect(eta_func, 3.0, 5.0)
         except ValueError:
             lamb = 3.5
-            print 'USING DEFAULT LAMB = ', lamb
+            print('USING DEFAULT LAMB = ', lamb)
 
         #Injection momentum from the thermal tail, converted to MeV/c
         pinj = lamb*mh*(U*1E5/r)*np.sqrt(gamma_ad*(r-1))
@@ -154,7 +154,7 @@ class ProtostarCR():
         try:
             beta_test = sopt.bisect(Elossfunc, betath, 1.0)
         except ValueError:
-            print "bisect failed - loss"
+            print("bisect failed - loss")
             failCount += 1
             beta_test = 0.9999999999999999
         gamma_test = gamma(beta_test)
@@ -165,7 +165,7 @@ class ProtostarCR():
             gamma_test = gamma(beta_test)
             E_damp = mpc2*(gamma_test-1)
         except ValueError:
-            print "bisect failed - damp"
+            print("bisect failed - damp")
             failCount += 1
             E_damp = 1E50
 
@@ -174,7 +174,7 @@ class ProtostarCR():
             gamma_test = gamma(beta_test)
             E_escu = mpc2*(gamma_test-1)
         except ValueError:
-            print "bisect failed - esc_u"
+            print("bisect failed - esc_u")
             failCount += 1
             E_escu = 1E50
 
@@ -203,7 +203,7 @@ class ProtostarCR():
         return {"pmin":pinj_MeVc*1E-3, "pmax":p_max, "q":q, "f0":f0, 'emax':E_max, 'emin':EfuncP(pinj_MeVc*1E-3), "pcr":PCR, 'losstype':emaxtype}
 
     #Same as below, but only using the constraint of energy losses, ignoring all others
-    def calcSpecParamsLE(U, T, nh, B, Rsh, Rp = 0):
+    def calcSpecParamsLE(self, U, T, nh, B, Rsh, Rp = 0):
         betath = 2E-3*(T/1E4)**(0.5)
         cs = np.sqrt((gamma_ad*kb*T)/(mu*mh))/1E5 #put into km/s
         Ms = U/cs
@@ -218,7 +218,7 @@ class ProtostarCR():
         def eta_func(lamb):
             return eta - (4./(3.*np.sqrt(np.pi)))*(r - 1)*lamb**3*np.exp(-lamb**2)
         def LEcp(beta): #in 1E-25 GeV cm^2
-              return LE1((gamma(beta)-1.)*mpc2)#0.1*((x*beta)/(betath**3 + beta**3))
+              return self.LE1((gamma(beta)-1.)*mpc2)#0.1*((x*beta)/(betath**3 + beta**3))
         def Elossfunc(beta):
             Up = U/1E2 #U/1E2
             nhp = nh/1E6 #n/1E6
@@ -250,7 +250,7 @@ class ProtostarCR():
         try:
             beta_test = sopt.bisect(Elossfunc, betath, 1.0)
         except ValueError:
-            print "Using fminbound"
+            print("Using fminbound")
             beta_test = sopt.fminbound(Elossfunc, betath, 1.0)
         gamma_test = gamma(beta_test)
         E_loss = min(mpc2*(gamma_test-1), 50.)
