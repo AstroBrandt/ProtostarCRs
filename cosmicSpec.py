@@ -51,9 +51,23 @@ class CRSpectrum():
     def EfuncP(self, p):
         mpc2 = 0.938 #GeV
         return np.sqrt(p**2 + mpc**2) - mpc2
-    def vfuncE(self, E):
+    def gammaFuncE(self, E):
         mpc2 = 0.938 #GeV
-        return np.sqrt(E/mpc2)*np.sqrt((E/mpc2) + 2)/((E/mpc2) + 1)
+        X = E/mpc2
+        gamma = X + 1
+        return gamma
+
+    def vFuncGamma(self, gamma):
+        v = np.sqrt(1 - 1/(gamma**2))
+        return v
+
+    def vFuncE(self, E):
+        gamma = self.gammaFuncE(E)
+        v = self.vFuncGamma(gamma)
+        return v
+    #def vfuncE(self, E):
+    #    mpc2 = 0.938 #GeV
+    #    return np.sqrt(E/mpc2)*np.sqrt((E/mpc2) + 2)/((E/mpc2) + 1)
 
     #This spectrum allows one to define a power-law spectrum, defined in momentum space
     #With a power-law index of q, normalization factor of f0 between pmin and pmax, in GeV/c
