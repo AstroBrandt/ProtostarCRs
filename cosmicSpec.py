@@ -61,7 +61,7 @@ class CRSpectrum():
         v = np.sqrt(1 - 1/(gamma**2))
         return v
 
-    def vFuncE(self, E):
+    def vfuncE(self, E):
         gamma = self.gammaFuncE(E)
         v = self.vFuncGamma(gamma)
         return v
